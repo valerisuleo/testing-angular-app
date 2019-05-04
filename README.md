@@ -75,7 +75,7 @@ It involves 2 pieces together: component + template. In other words **we are tes
 
 _Test the entire app as a whole._
 
-Now we can write for integration tests for our component and it might pass the test, however the app might not still works as we expect. Because we are still looking at the individual component and not at the app as a whole.
+Now we can write few integration tests for our component and it might pass the test, however the app might not still works as we expect. Because we are still looking at the individual component and not at the app as a whole.
 
 They are:
 
