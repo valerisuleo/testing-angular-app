@@ -73,3 +73,62 @@ describe('compute', () => {
   })
 })
 ```
+
+## Working with strings and arrays
+
+### Strings
+
+In `greet.ts` we have this simple `fun`:
+
+```
+export function greet(name) {
+  return 'Welcome ' + name;
+}
+```
+
+Now in the `greet.spec.ts` we wanna test it:
+
+```
+import { greet } from './greet'
+
+describe('greet', () => {
+  it('should include the name in the message', () => {
+    expect(greet('mosh')).toBe('Welcome mosh');
+  })
+})
+```
+
+> There is a problem with this implementation. Why?
+> This test is too specific!
+
+If we add an `!`
+
+```
+export function greet(name) {
+  return 'Welcome ' + name + '!';
+}
+```
+
+our test is gonna brake.
+
+So instead of `toBe` we are gonna use `toContain` to check the existence of our `name` in our string.
+
+```
+describe('greet', () => {
+  it('should include the name in the message', () => {
+    expect(greet('mosh')).toContain('Welcome mosh');
+  })
+})
+```
+
+We did pass the test!
+
+### Arrays
+
+```
+export function getCurrencies() {
+  return ['USD', 'AUD', 'EUR'];
+}
+```
+
+We write  test just to be sure that is returning those string. We don't care about the index.
