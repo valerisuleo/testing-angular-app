@@ -2,7 +2,7 @@
 
 It's the practice of writing code to test our code and then run those test in automated way.
 
-Imagine we have this funciotn somewhere in our application. It's base calculating `fun` and based on some condiotions return a different value.
+Imagine we have this function somewhere in our application. It's base calculating `fun` and based on some conditions return a different value.
 Now with _manual testing_ we have to launch the app on the browser and it takes time...
 
 ```
@@ -26,7 +26,7 @@ var result = calculate(y);
 
 >be **pragmatic**
 
-Although automated test has lots of pros, it does not always fit any team or project. First the team needs discipline in order to write and mantain automated tests. If you don't work in a team like that, it may cost you more than the value you can get out of it, because you will spend lots of time trying to fix broken code test.
+Although automated test has lots of pros, it does not always fit any team or project. First the team needs discipline in order to write and maintain automated tests. If you don't work in a team like that, it may cost you more than the value you can get out of it, because you will spend lots of time trying to fix broken code test.
 
 Another factor is **time** and **budget** of your project. Let's say you are a _startup_ and you have 3 months to turn a project into a real working software. It's better writing test only for part of app that will take more time testing manually.
 
@@ -42,11 +42,11 @@ In general we have 3 different types of tests:
 
 ### Unit Test
 
-_Test a component in **isolation**, whithout external resources (e.g. file system, database, api endpoints)._
+_Test a component in **isolation**, without external resources (e.g. file system, database, api endpoints)._
 
-In `angular` terms that means testing a components in isolation whitout its templates or any other resources.
+In `angular` terms that means testing a components in isolation without its templates or any other resources.
 
-So if our componet is using a `service` to talk to an api endpoint or a `router`  we give to him a `Fake Service/router`, we assume that the service is doing its job properli and we focus on the functionality of the component.
+So if our component is using a `service` to talk to an api endpoint or a `router`  we give to him a `Fake Service/router`, we assume that the service is doing its job properly and we focus on the functionality of the component.
 
 They are:
 
@@ -64,11 +64,11 @@ We can't look at this `class` as a plain typescript class we need to look at it 
 
 > Require more code than a simple Unit Test.
 
-Again if our componet is using a `service` to talk to an api endpoint we give to him a `Fake Service`, we assume that the service is doing its job properli and we focus on the functionality of the component.
+Again if our component is using a `service` to talk to an api endpoint we give to him a `Fake Service`, we assume that the service is doing its job properly and we focus on the functionality of the component.
 
 > What's the difference with Unit?
 
-It involves 2 pieces together: component + template. In other words **we are testing the integration of our compoments with its template**
+It involves 2 pieces together: component + template. In other words **we are testing the integration of our component with its template**
 
 
 ### End-to-end
@@ -84,10 +84,3 @@ They are:
 - give us confidence about the functionality of our app
 
 **We should use _e2e_ test only for key functionality.**
-
-
-
-
-
-
-
