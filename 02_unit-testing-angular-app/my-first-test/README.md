@@ -495,3 +495,200 @@ component.upVote();
 ```
 expect(totalVotes).not.toBeNull();
 ```
+
+## Working with Spies
+
+Now we are gonna take a look at a component who use `service` to call the backend.
+
+Go to `/todos.component.ts`
+
+```
+  ngOnInit() {
+this.service.getTodos()
+.subscribe((response: any) => {
+  this.todos = response;
+})
+}
+```
+  
+> What should we test here?
+
+Let's see what's happening in this method:
+
+1. We are calling `service.getTodos()` which returns an `observable`.
+2. We `subcribe` to the `observable`
+3. We initialise the to `todos` property
+
+
+> What should we test here again?
+
+So in our **test** we wanna call `ngOnInit` and be sure to initialise the `todos property`.
+
+
+However **we are not gonna use this `service`** because in unit test we dont'wanna touch files system, database or call back a service. We wanna isolate the component from external resources.
+So we are gonna give to this component a _fakeService_
+
+```
+describe('TodosComponent', () => {
+  let component: TodosComponent;
+});
+```
+
+1. I am gonna declare a `service` here: 
+
+	```
+	describe('TodosComponent', () => {
+	  let component: TodosComponent;
+	  let service: TodoService;
+	});
+	```
+
+2. Initialize the `service`
+	
+	```
+	describe('TodosComponent', () => {
+	  let component: TodosComponent;
+	  let service: TodoService;
+	
+	  beforeEach(() => {
+	    service = new TodoService();
+	  });
+	```
+	
+	> Now here in the constructor `service = new TodoService()` we need to pass an instance of the `Http` service in angular. We are not gonna do that because it would made things overcomplicated. 
+
+3. Instead we are gonna pass **`null`**, althought it doesn't really matter because we are not gonna use the `Http` service anyway.
+
+	```
+	let component: TodosComponent;
+	let service: TodoService;
+		
+	beforeEach(() => {
+	service = new TodoService(null);
+	component = new TodosComponent(service);
+	});
+	```
+
+4. Now let's write the **Test**
+
+	```
+	it('should set todos property with the respose return from the service', () => {
+		});
+	});
+	```
+
+#### Arrange
+
+We wanna change the implementation of `getTodos()`. To do that we use a function in _Jasmine_ called `spyOn()`.
+
+> `spyOn()` _put a spy on a method in a class_.
+
+With that spy we can: 
+
+- check if a method has been called;
+- change the implementation of that method; 
+- return a different value;
+- throw an error;
+
+It takes 2 `args`: 
+the **first** arg is the `obj` we wanna put a spy on
+
+```
+spyOn(service, )
+```
+
+and the **second** is the name of the method in that `obj`
+
+```
+spyOn(service, 'getTodos')
+```
+
+```
+it('should set todos property with the respose return from the service', () => {
+    spyOn(service, 'getTodos').and.callFake()
+  });
+```
+
+> With `.and.callFake()` we can change the implementation of `getTodos()` method.
+ 
+Let's have a quick look at the implementation of this method:
+
+```
+  getTodos() {
+    return this.http.get('...')
+    .map(response => response.json());
+  }
+```
+
+`getTodos()` is a method with no parameters which returns an `observable`.
+
+So here:
+
+```
+it('should set todos property with the respose return from the service', () => {
+    spyOn(service, 'getTodos').and.callFake()
+  });
+```
+
+we need to pass a function with the exact same signature.
+
+```
+it('should set todos property with the respose return from the service', () => {
+    spyOn(service, 'getTodos').and.callFake(() => {
+      var obs = from([1, 2, 3, 4]);
+      return obs;
+    })
+  });
+```
+
+> We need to `import { Observable, from} from 'rxjs';`
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
