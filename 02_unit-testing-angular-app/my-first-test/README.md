@@ -76,7 +76,7 @@ describe('compute', () => {
 
 ## Working with strings and arrays
 
-### Strings
+#### Strings
 
 In `greet.ts` we have this simple `fun`:
 
@@ -123,7 +123,7 @@ describe('greet', () => {
 
 We did pass the test!
 
-### Arrays
+#### Arrays
 
 ```
 export function getCurrencies() {
@@ -288,11 +288,11 @@ _Each test should run in an isolated world. So we wanna start with  a clean stat
 > How can we do that?
 
 
-In _**Jasmine**_ we have 4 functions: 
+In _**Jasmine**_ we have 4 functions:
 
 - `beforeEach()` as arg we pass a `() =>` and our test runner is going to call this function before each test.
 
-- `afterEach()` it takes a function `() =>` that will be called aster each test and this is a place where you add your **clean up** code. 
+- `afterEach()` it takes a function `() =>` that will be called aster each test and this is a place where you add your **clean up** code.
 
 - `beforeAll()` which is executed once before each test.
 
@@ -357,9 +357,9 @@ export class TodoFormComponent {
     });
   }
 }
-``` 
+```
 
-In the `constructor` we are using the `FormBuilder` obj: 
+In the `constructor` we are using the `FormBuilder` obj:
 to create a `FormGroup`:
 
 ```
@@ -376,34 +376,34 @@ with **2 form controls**: _name_ and _email_.
 1. Once this component has been initialised we have a form group obj with 2 controls.
 2. We want to be sure that the name input field is required.
 
-#### The first test
+### The first test
 
 In `beforeEach()` we initialise our component like this:
 
 ```
 describe('TodoFormComponent', () => {
-  var component: TodoFormComponent; 
+  var component: TodoFormComponent;
 
   beforeEach(() => {
     component = new TodoFormComponent()''
   });
 ```
 
-Also we need to pass inside `TodoFormComponent()` an instabce of the `FormBuilder`
+Also we need to pass inside `TodoFormComponent()` an instance of the `FormBuilder`
 
 ```
-import { TodoFormComponent } from './todo-form.component'; 
-import { FormBuilder } from '@angular/forms'; 
+import { TodoFormComponent } from './todo-form.component';
+import { FormBuilder } from '@angular/forms';
 
 describe('TodoFormComponent', () => {
-  var component: TodoFormComponent; 
+  var component: TodoFormComponent;
 
   beforeEach(() => {
     component = new TodoFormComponent(new FormBuilder());
   });
 ```
 
-> We don't have any _Act or Arrange_ because we are not acting on it, we have onle _expectations_
+> We don't have any _Act or Arrange_ because we are not acting on it, we have only _expectations_
 
 
 ```
@@ -414,7 +414,7 @@ describe('TodoFormComponent', () => {
 
 Here we have a method called `contains()` which takes `'name'` and returns `true` if we have a control with that name.
 
-#### The second test
+### The second test
 
 ```
   it('should make the name control required', () => {
@@ -427,3 +427,71 @@ Here we have a method called `contains()` which takes `'name'` and returns `true
 ```
 
 > With `component.form.get('name')` we can get a form control inside this form group. Once we got it we can set its value = `''`. We expect it to return `false`.
+
+
+## Working with Event Emitter
+
+```
+
+import { EventEmitter } from '@angular/core';
+
+export class VoteComponent {
+  totalVotes = 0;
+  voteChanged = new EventEmitter();
+
+  upVote() {
+    this.totalVotes++;
+    this.voteChanged.emit(this.totalVotes);
+  }
+}
+```
+
+We have this property here `voteChanged` which is an `EventEmitter`
+
+When we upvote this component should raise an event called `voteChanged` and upgrade the `totalVotes`.
+
+### Test
+
+```
+import { VoteComponent } from './vote.component';
+
+describe('VoteComponent', () => {
+  var component: VoteComponent;
+
+  beforeEach(() => {
+    component = new VoteComponent();
+  });
+
+  it('should raise voteChanged when upVoted', () => {
+	// some code here...
+});
+
+```
+
+> How do we do that?
+
+`component.voteChanged` is an `EventEmitter` and as we know _EventEmitter are `observables`_ which it means we can `subscribe()` and get the event that has been raised.
+
+
+#### Arrange
+
+```
+  it('should raise voteChanged when upVoted', () => {
+    let totalVotes = null;
+    component.voteChanged.subscribe(tv => totalVotes = tv);
+  });
+```
+
+Now when we subscribe to observable we can set this `let totalVotes` variable to what we get from the event.
+
+#### Act
+
+```
+component.upVote();
+```
+
+#### Assert
+
+```
+expect(totalVotes).not.toBeNull();
+```
