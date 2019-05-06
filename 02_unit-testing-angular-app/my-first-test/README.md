@@ -342,3 +342,88 @@ In _automated testing terms_ we refer to what we write in the `beforeEach()` as 
 
 ## Working with Forms
 
+Let's have a look at `/todo-form.component`:
+
+```
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+
+export class TodoFormComponent {
+  form: FormGroup;
+
+  constructor(fb: FormBuilder) {
+    this.form = fb.group({
+      name: ['', Validators.required],
+      email: [''],
+    });
+  }
+}
+``` 
+
+In the `constructor` we are using the `FormBuilder` obj: 
+to create a `FormGroup`:
+
+```
+this.form = fb.group({
+      name: ['', Validators.required],
+      email: [''],
+    });
+```
+
+with **2 form controls**: _name_ and _email_.
+
+> What should we test here?
+
+1. Once this component has been initialised we have a form group obj with 2 controls.
+2. We want to be sure that the name input field is required.
+
+#### The first test
+
+In `beforeEach()` we initialise our component like this:
+
+```
+describe('TodoFormComponent', () => {
+  var component: TodoFormComponent; 
+
+  beforeEach(() => {
+    component = new TodoFormComponent()''
+  });
+```
+
+Also we need to pass inside `TodoFormComponent()` an instabce of the `FormBuilder`
+
+```
+import { TodoFormComponent } from './todo-form.component'; 
+import { FormBuilder } from '@angular/forms'; 
+
+describe('TodoFormComponent', () => {
+  var component: TodoFormComponent; 
+
+  beforeEach(() => {
+    component = new TodoFormComponent(new FormBuilder());
+  });
+```
+
+> We don't have any _Act or Arrange_ because we are not acting on it, we have onle _expectations_
+
+
+```
+  it('should create  form with 2 controls', () => {
+    expect(component.form.contains('name')).toBeTruthy();
+  });
+```
+
+Here we have a method called `contains()` which takes `'name'` and returns `true` if we have a control with that name.
+
+#### The second test
+
+```
+  it('should make the name control required', () => {
+    let control = component.form.get('name');
+
+    control.setValue('');
+
+    expect(control.valid).toBeFalsy();
+  });
+```
+
+> With `component.form.get('name')` we can get a form control inside this form group. Once we got it we can set its value = `''`. We expect it to return `false`.
