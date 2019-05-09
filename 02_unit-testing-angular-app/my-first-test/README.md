@@ -644,51 +644,301 @@ it('should set todos property with the respose return from the service', () => {
 > We need to `import { Observable, from} from 'rxjs';`
 
 
+#### Act
+
+`component.ngOnInit();`
+
+#### Assertetion
+     
+`expect(component.todos.length).toBeGreaterThan(0);`
+
+We can also be more specific:
+
+
+```
+      let arrayofObj = [
+      { id: 1, title: 'a'},
+      { id: 2, title: 'a'},
+      { id: 3, title: 'a'}
+    ]
+    
+    spyOn(service, 'getTodos').and.callFake(() => {
+      var obs = from(arrayofObj);
+      return obs;
+    })
+    component.ngOnInit();
+
+    expect(component.todos).toBe(arrayofObj); 
+  });
+  
+```
+
+## Interaction Testing
+
+We have tested only
+
+```
+  ngOnInit() {
+    this.service.getTodos()
+    .subscribe((response: any) => {
+      this.todos = response;
+    })
+  }
+```
+
+Now let's focus on the `add()`
+
+
+```
+  add() {
+    const vm = this;
+    var newTodo = { title: '... ' };
+
+    vm.service.add(newTodo)
+    .subscribe((data: any) => {
+      vm.todos.push(data);
+    }, err => {
+      this.message = err;
+    });
+  }
+```
+
+Here we need to write **3 tests**:
+
+1. we wanna be sure that this componente is calling the `service` 
+2. If the result is successful the `newTodo` obj will be added to the array.
+3. If the server returns an `err` we put that error in the `message` property.
+
+### First Test
+
+#### Arrange
+
+_'It should call the server to save the changes when a new todo obj is added'_
+
+So we are gonna replace the `add()` method in the service and we replace it with a new method here:
+
+```
+  it('should call the server to save the changes when a new todo obj is added', () => {
+    spyOn(service, 'add').and.callFake();
+```
+
+Let's have a look at the original method:
+
+```
+  add(todo) {
+    return this.http.post('...', todo)
+    .map(response => response.json());
+  }
+```
+
+It takes a `todo` obj and it returns an `observable`. So once again in the `/spec.ts` we need to return an `observable` as well.
+
+```
+it('should call the server to save the changes when a new todo obj is added', () => {
+    spyOn(service, 'add').and.callFake(() => {
+      return EMPTY;
+    });
+```
+
+> We use `EMPTY ` because we just don't care what it returns at the moment.
+
+#### Act
+
+```
+  it('should call the server to save the changes when a new todo obj is added', () => {
+    spyOn(service, 'add').and.callFake(() => {
+      return EMPTY;
+    });
+
+    component.add();
+  });
+```
+
+#### Assertetion
+
+We wanna be sure that `service.add()` is called.
+
+> How can we do that?
+
+First we need to declare a variable here and set it to what is return from `spyOn`
+
+
+```
+  it('should call the server to save the changes when a new todo obj is added', () => {
+    let spy = spyOn(service, 'add').and.callFake(() => {
+      return EMPTY;
+    });
+```
+
+**Then**...
+
+```
+  it('should call the server to save the changes when a new todo obj is added', () => {
+    let spy = spyOn(service, 'add').and.callFake(() => {
+      return EMPTY;
+    });
+
+    component.add();
+
+    expect(spy).toHaveBeenCalled();
+  });
+```
+
+> `toHaveBeenCalled()` this is how we can test if a given method has been called.
+
+
+### Second Test
+
+_'It should add the new todo returned from the server'_
+
+#### Arrange
+
+Instead of `empty()` we use once again `from()`; now here the response from the server includes only one obj.
+
+```
+  it('should add the new todo returned from the server', () => {
+    let spy = spyOn(service, 'add').and.callFake(() => {
+      var obs = from([{
+        id: 1, title: 'd'
+      }]);
+      return obs;
+    });
+```
+
+#### Assertetion
+
+We wanna ensure that this todo obj has returned from the server is in our array.
+
+```
+  it('should add the new todo returned from the server', () => {
+    let newObj = { id: 1, title: 'd' }
+    let spy = spyOn(service, 'add').and.callFake(() => {
+      var obs = from([newObj]);
+      return obs;
+    });
+
+    component.add();
+
+    expect(component.todos.indexOf(newObj)).toBeGreaterThan(-1);
+  });
+```
+
+### Third Test
+
+_'It should set the message property if server returns when adding a newTodo'_
+
+Now instead of creating an observable from an `array`, we wanna create an observable from an `error`.
+
+```
+it('should set the message property if server returns when adding a newTodo', () => {
+
+    spyOn(service, 'add').and.returnValue(Observable.throw());
+```
+
+`throw()` require an error message so we declare a variable `let error = 'error from the server'` and we pass it as arg:
+
+```
+  it('should set the message property if server returns when adding a newTodo', () => {
+  
+    let error = 'error from the server';
+    
+    spyOn(service, 'add').and.returnValue(Observable.throw(error));
+  });
+```
+
+#### Assertetion
+
+```
+  it('should set the message property if server returns when adding a newTodo', () => {
+    let error = 'error from the server';
+    spyOn(service, 'add').and.returnValue(Observable.throw(error));
+
+    component.add();
+
+    expect(component.message).toBe(error);
+  });
+```
+
+## Working with confirmation checkbox
+
+So we have written 3 test for our `add()` method, now let's move on to the last method `delete()`.
+
+Here's where we display the confrimation box. If the user confirms we should call the server to delete this item  and if not the server should not be called.
+
+So we need **2 tests** here:
+
+1. should call the server to delete a todo item if the user confirms
+
+
+### First Test
+
+
+#### Arrange
+
+Now in this test, apart from changing the implemtation of this service, we also wanna **change the implementation** of `window.confirm()`, because we don't wanna display a confirm box while we run unit test.
+
+```
+  it('should call the server to delete a todo item if the user confirms', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+  });
+```
+
+
+#### Assertion
+
+we wanna ensure that the delete method of our service is called.
+
+So I am gonna declare a variable `let spy`:
+
+```
+  it('should call the server to delete a todo item if the user confirms', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    
+    let spy = spyOn(service, 'delete').and.returnValue(EMPTY);
+
+    component.delete(1);
+
+    expect(spy).toHaveBeenCalled()
+  });
+```
+
+### Second Test
+
+We wanna be sure that if the user presses the cancel btn in the confirmation boxm we are not gonna call the server to delete that item.
+
+```
+  it('should NOT call the server to delete a todo item if the user confirms', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    let spy = spyOn(service, 'delete').and.returnValue(EMPTY);
+
+    component.delete(1);
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+```
+
+
+## Limitation of unit tests
+
+- **Routers**: If our component is using a router it's not easy to unit test that. We need to run that component into angulat environment.
+- **Template bindings**: if we set a property in the component with these unit tests we can't ensure if the component renders that property or not. Similary if we click on the btn in the view we can't ensure if the corrisponding method in the component is called or not.
+
+## Code Coverage
+
+As we write test for our app we need to know ho much code is covered with test.
+
+Back in terminal when we run `ng test` we are gonna pass a parameter:
+
+>`ng test --code-coveage`
+
+This will create a new folder in the tree `/coverage` which gives us a **report of how much of our code is under test**.
+
+So open up `index.html` in the broweser and let's what we get. 
+
+> What is the ideal number for code coverage?
+
+It really depends on budget/time of the project, however it's to good to have at least **70%**; otherwise focus on methods with complex logic, especially methods with multiple execution paths that take longer to test manually. 
 
 
 
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
