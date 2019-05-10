@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { faCoffee } from '@fortawesome/free-solid-svg-icons';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'like',
@@ -8,15 +7,14 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 })
 export class LikeComponent implements OnInit {
 
-  @Input() totalLikes = 0;
-  @Input() iLike = false;
-
-  faCoffee = faCoffee;
+  totalLikes = 0;
+  iLike = false;
 
   constructor() { }
 
   click(){
     this.iLike = !this.iLike;
+    console.log(this.iLike);
     this.totalLikes += this.iLike ? 1 : -1;
   }
 
