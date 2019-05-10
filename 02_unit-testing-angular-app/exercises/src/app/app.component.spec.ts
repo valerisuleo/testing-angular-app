@@ -1,6 +1,7 @@
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { LikeComponent } from './like/like.component';
+import { VoterComponent } from './voter/voter.component';
 
 
 describe('AppComponent', () => {
@@ -8,7 +9,8 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,
-        LikeComponent
+        LikeComponent,
+        VoterComponent
       ],
     }).compileComponents();
   }));
