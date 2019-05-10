@@ -4,6 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'txtSummary'
 })
 export class TxtSummaryPipe implements PipeTransform {
+
   transform(value: any, args?: any): any {
     if (!value)
       return '';
