@@ -3,8 +3,8 @@ import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'user',
-  templateUrl: './user.component.html',
-  styleUrls: ['./user.component.css']
+  // templateUrl: './user.component.html',
+  // styleUrls: ['./user.component.css']
 })
 export class UserComponent implements OnInit {
 
@@ -12,16 +12,19 @@ export class UserComponent implements OnInit {
 
   constructor(private service: UserService) {	}
 
-  deleteUser(user: any) {
-    if (confirm("Are you sure you want to delete " + user.name + "?")) {
-      var index = this.users.indexOf(user)
-      this.users.splice(index, 1);
+    deleteDonut(user: any) {
+      const vm = this;
 
-      this.service.deleteUser(user.id).subscribe(
-        null,
-        err => {
+      if (confirm("Are you sure you want to delete " + user.name + "?")) {
+        vm.service.deleteUser(user)
+        .subscribe(() => {
+          // 1. we need to find the index of the item in the array
+          let userIndex = vm.users.indexOf(user);
+          // 2. now we can pass the index as argument into the splice method.
+          vm.users.splice(userIndex, 1);
+        }, err => {
+          console.log(err);
           alert("Could not delete the user.");
-          this.users.splice(index, 0, user);
         });
       }
     }
