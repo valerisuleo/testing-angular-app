@@ -3,7 +3,9 @@ import { Http } from '@angular/http';
 import { map } from "rxjs/operators";
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserService {
   private url = "http://jsonplaceholder.typicode.com/users";
 
@@ -13,7 +15,7 @@ export class UserService {
     return this.http.get(this.url)
     .pipe(map(response => response.json()));
   }
-  
+
   getUser(userId: any) {
     return this.http.get(this.getUserUrl(userId))
     .pipe(map(res => res.json()));
