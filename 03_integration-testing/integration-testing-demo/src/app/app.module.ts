@@ -12,6 +12,7 @@ import { UsersComponent } from './users/users.component';
 import { routes } from './app.routes';
 // import { NavComponent } from './nav/nav.component';
 import { HighlightDirective } from './highlight.directive';
+import { UserDetailsComponent } from './user-details/user-details.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { HighlightDirective } from './highlight.directive';
     VoterComponent,
     HomeComponent,
     UsersComponent,
-    HighlightDirective
+    HighlightDirective,
+    UserDetailsComponent
   ],
   imports: [
     BrowserModule,
