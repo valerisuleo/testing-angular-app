@@ -39,5 +39,16 @@ export class UserComponent implements OnInit {
       .subscribe((response: any) => {
         this.activeUser = response;
       })
+
+
+      /*
+
+      on deleteUser :
+         set actuveuser to undefined
+
+
+      on deleteUser with id '123'
+
+*/
     }
 }

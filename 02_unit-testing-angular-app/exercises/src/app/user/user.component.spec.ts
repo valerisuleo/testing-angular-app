@@ -106,6 +106,11 @@ describe('UserComponent', () => {
   });
 
 
+  it('should set activeUser to undefined on deleteUser', () => {
+    expect(component.activeUser.id).toEqual(TESTDATA[0].id);
+  });
+
+
 
 
 

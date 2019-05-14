@@ -6,7 +6,7 @@ import { map } from "rxjs/operators";
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserServiceStub {
   private url = "http://jsonplaceholder.typicode.com/users";
 
   constructor(private http: Http) {}
