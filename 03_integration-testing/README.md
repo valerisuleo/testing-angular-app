@@ -13,7 +13,7 @@ That's what _Integration Test_ are for!
 - Testing directives
 - Dealing with asynch operations
 
-## Setup code
+## Setup Code
 
 ```
 import { VoterComponent } from './voter.component';
@@ -206,8 +206,100 @@ describe('UsersComponent', () => {
 
 ## Testing Property and Class Binding
 
+Anywhere we have **bindings**: property, class, style or event.
+
+```
+    <i
+        class="glyphicon glyphicon-menu-up vote-button"
+        [class.highlighted]="myVote == 1"
+        (click)="upVote()"></i>
+
+    <span class="vote-count">{{ totalVotes }}</span>
+```
+
+> What are we gonna test here?
+
+1. wanna ensure that the `totalVotes` property is rendering properly.
+2. if `upVote()` I wanna be sure that we apply the `highlighted` class to our icon.
+3. I wanna be sure that when I click this icon the `upVote()` method is called and `totalVotes` is increased.
+
+```
+  it('it should render totalVotes', () => {
+    component.othersVote = 20;
+    component.myVote = 1;
+  });
+```
+
+It shpuld return `21` but what matters for us now is **where** we are gonna display this result?
+
+`<span class="vote-count">{{ totalVotes }}</span>`
+
+So we wanna `query` the **DOM** and get a reference for this element, and to do that will use a **`fixture`**
+
+`fixture.debugElement.query()`
+
+> This `query` method takes a `predicate` which is basically a `fn` that will return `true` if some condition is met.
+
+To do that, on the top `import { By } from '@angular/platform-browser'` 
+
+```
+  it('it should render totalVotes', () => {
+    component.othersVote = 20;
+    component.myVote = 1;
+
+    fixture.debugElement.query(By.css(''))
+  });
+```
+
+> We also have another method `fixture.debugElement.query(By.directive('.vote-count'));`. So if you have a custom directive and you wanna find an element that has that directive applied to it we can pass the directive inside the type selector `('')`.
+
+As we know `fixture` is just a wrapper around our html element `let de = fixture.debugElement.query(By.css('.vote-count'));`
+
+In order to access to the actual element we can do: `de.nativeElement` however because by default the type is set to `any` we haven't access to intellisense.
+We can fix it in this way:
+
+```
+  it('it should render totalVotes', () => {
+    component.othersVote = 20;
+    component.myVote = 1;
+
+    let de = fixture.debugElement.query(By.css('.vote-count'));
+    let el: HTMLElement = de.nativeElement;
+
+    expect(el.innerText).toContain('21');
+  });
+```
+
+Now if we run this test we can see in the terminal this error: _Expected '' to contain '21'._
+
+> Why our test in broken?
+
+Because outside of these tests angular regulary runs its algorithm to detect changes and updating the DOM, but here we have to tell esplicitly to do that.
+
+So if we do:
+
+```
+  it('it should render totalVotes', () => {
+    component.othersVote = 20;
+    component.myVote = 1;
+    fixture.detectChanges();
+
+    let de = fixture.debugElement.query(By.css('.vote-count'));
+    let el: HTMLElement = de.nativeElement;
+
+    expect(el.innerText).toContain('21');
+  });
+```
+
+It will work! :) 
 
 
+
+
+
+
+
+ 
 
 
 
