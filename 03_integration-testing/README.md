@@ -62,11 +62,11 @@ Now here we only gonna use the `declaretion` part because we don't need anything
 
 **3)** Now in order to create an instance of this component we call: `TestBed.createComponent(VoterComponent)` and the arg. of this method is the component itself.
 
-> Look at the return type of this method: it does not return an instance of the component, it return: `ComponentFixture<VoterComponent>` whic is a generic class. So this ComponentFixture is a wrapper around our component instance; we that we can get access to both the component's instance and its template.
+> Look at the return type of this method: it does not return an instance of the component, it return: `ComponentFixture<VoterComponent>` whic is a generic class. So this ComponentFixture is a wrapper around our component instance; with that we can get access to both the component's instance and its template.
 
 **4)**`import { TestBed, ComponentFixture } from '@angular/core/testing'`
 
-**5)** Let's declare now a couple of variable:
+**5)** Let's declare now a couple of variables:
 
 ```
 describe('VoterComponent', () => {
@@ -126,6 +126,93 @@ Now this fixture also has some properties:
 ```
 
 So this is the basic setup for writing integration test.
+
+### Why the setup code is differente when we use Angular CLI ?
+
+Just like before we have the declaration of component and its fixture:
+
+```
+describe('UsersComponent', () => {
+  let component: UsersComponent;
+  let fixture: ComponentFixture<UsersComponent>;
+```
+
+> However we have now 2 `beforeEach` blocks ?!
+
+In the **first** `beforeEach` block we configure our testing module
+
+```
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ UsersComponent ]
+    })
+    .compileComponents();
+  }));
+```
+
+In the **second** block we create the component.
+
+```
+  beforeEach(() => {
+    fixture = TestBed.createComponent(UsersComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+```
+
+> Why has it been implemented in this way?
+
+The reason for this it's because the component's template is in a separate file and we need to instruct angular to compile that template as part of the stylesheet with the component implementation.
+
+**Note** that we have a call to `compileComponents()` method which is chained to `configureTestingModule`; so with this we are telling angulare to compile all the componets we've declared here `declarations: [ UsersComponent ]` along with theri templates and stylesheets.
+
+Now because these files are external angular needs to access to the files systems, and access to the files systems is a littel bit slow. That's why `compileComponents` does this async:
+
+```
+beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ UsersComponent ]
+    })
+    .compileComponents();
+  }));
+```
+
+#### Refactoring...
+
+> In the last lecture we didn't have a call to `compileComponents()`. Why?
+
+Because when we use `webpack`automatically inlines the component template and stylesheet in our javascript file and this means we don't really have to call this `compileComponents()` method and it's adding extra complexity (we have 2 `beforeEach` block). So we can do:
+
+```
+describe('UsersComponent', () => {
+  let component: UsersComponent;
+  let fixture: ComponentFixture<UsersComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [ UsersComponent ]
+    });
+    
+    fixture = TestBed.createComponent(UsersComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+```
+
+## Testing Property and Class Binding
+
+
+
+
+
+
+
+
 
 
 
