@@ -1,27 +1,58 @@
-# Exercises
+## Working with Spies
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
+```
+ngOnInit() {
+	this.userService.getAll()
+	.subscribe((response: any[]) => {
+	this.users = response;
+})
+```
+  
+> What should we test here?
 
-## Development server
+Let's see what's happening in this method:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. We are calling `userService.getAll()` which returns an `observable`.
+2. We `subcribe` to the `observable`
+3. We initialise the `users` property
 
-## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+> What should we test here again?
 
-## Build
+So in our **test** we wanna call `ngOnInit` and be sure to initialise the `users property`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-## Running unit tests
+However **we are not gonna use this `service`** because in unit test we dont'wanna touch files system, database or call back a service. We wanna isolate the component from external resources.
+So we are gonna give to this component a _fakeService_
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+describe('TodosComponent', () => {
+  let component: TodosComponent;
+});
+```
 
-## Running end-to-end tests
+1. I am gonna declare a `service` and replacing the original service with the fake one `{ provide: UserService, useValue: UserServiceStub }`
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+	```
+	  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ UserComponent ],
+      providers: [
+        { provide: UserService, useValue: UserServiceStub }
+      ]
+    })
+  }));
+  	```
 
-## Further help
+2. Now we cau use a `spy` to change the implementaion of the method `getAll()`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+	```
+	const UserServiceStub: any = {
+	  getAll:jasmine.createSpy('getAll').and.returnValue(of(TESTDATA))
+	}
+	```
+
+
+
+
+
