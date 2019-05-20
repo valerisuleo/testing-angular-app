@@ -1,23 +1,23 @@
-
 import { Http } from '@angular/http';
-import 'rxjs/add/operator/map';
+import { map } from "rxjs/operators";
+
 
 export class TodoService {
   constructor(private http: Http) {
   }
 
-  add(todo) {
+  add(todo: any) {
     return this.http.post('...', todo)
-    .map(response => response.json());
+    .pipe(map(response => response.json()));
   }
 
   getTodos() {
     return this.http.get('...')
-    .map(response => response.json());
+    .pipe(map(response => response.json()));
   }
 
   delete(id) {
     return this.http.delete('...')
-    .map(response => response.json());
+    .pipe(map(response => response.json()));
   }
 }
