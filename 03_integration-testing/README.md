@@ -223,6 +223,9 @@ Anywhere we have **bindings**: property, class, style or event.
 2. if `upVote()` I wanna be sure that we apply the `highlighted` class to our icon.
 3. I wanna be sure that when I click this icon the `upVote()` method is called and `totalVotes` is increased.
 
+
+#### First test
+
 ```
   it('it should render totalVotes', () => {
     component.othersVote = 20;
@@ -293,23 +296,159 @@ So if we do:
 
 It will work! :) 
 
+#### Second test
+
+if `upVote()` I wanna be sure that we apply the `highlighted` class to our icon.
+
+
+
+## Providing Stubs
+
+Ok, now let's test a component who uses router for navigation.
+
+```
+  save() { 
+    this.router.navigate(['users']);
+  }
+```
+
+In this component when we click call the `save()` we are gonna take the user to `/users`.
+
+We write 2 tests:
+
+1. to ensure this component is interacting with the `router` properly .
+2. to ensure that we have a proper `route`.
+
+> We don't wanna interact with the real `service` so will replace it with a **Stub**.
+
+Let's have a look at the component:
+
+`constructor(private router: Router, private route: ActivatedRoute)`
+
+In our test we need to tell angular to replace both `Router` and `ActivatedRoute` with stubs.
+
+> How?
+
+```
+class RouterStub {
+  navigate(params) {
+
+  }
+}
+
+class ActivatedRouteStub {
+  parmas: Observable<any>;
+}
+
+describe('UserDetailsComponent', () => {
+  let component: UserDetailsComponent;
+  let fixture: ComponentFixture<UserDetailsComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ UserDetailsComponent ],
+      providers: [
+        { provide: Router, useClass: RouterStub },
+        { provide: ActivatedRoute, useClass: ActivatedRouteStub }
+      ],
+    })
+    .compileComponents();
+  }));
+```
+
+At this point we are gonna get an **err** `Cannot read property 'subscribe' of undefined`.
+
+> Why?
+
+Bacause we subscribed to this observable `this.route.params.subscribe`; however in we did not initalise this property `parmas: Observable<any>` so it's `undefined`.
+
+> Fix it
+
+Let's initialise this `params: Observable<any> = EMPTY;` to empty observable.
+
+
+## Testing Navigation
+
+1. We wanna add a `spy` on the `navigate` method of the router, in order to do that we need a reference to this router:
+
+	```
+	  it('should redirect user to the user page after saving', () => {
+	    let router = TestBed.get(Router);
+	    let spy = spyOn(router, 'navigate');
+	
+	    component.save();
+	
+	    expect(spy).toHaveBeenCalledWith(['users']);
+	  });
+	```
+
+2. We wanna ensure that we have a `route` configured for this path.
+
+	`touch app/app.routes.ts`
+	
+	```
+	import { routes } from './app.routes';
+	import { UsersComponent } from './users/users.component';
+	
+	describe('routes', () => {
+	
+	  it('should contain a route for /users', () => {
+	
+	    expect(routes).toContain({ path: 'users', component: UsersComponent });
+	  });
+	
+	
+	});
+```
 
 
 
 
+## Dealing With Routes Params
 
 
- 
+```
+  ngOnInit() {
+    this.route.params.subscribe(p => {
+      if (p['id'] === 0)
+        this.router.navigate(['not-found']);
+    });
+  }
+```
+
+Here we are subscribing to the `params` property of these route which is an **observable** 
+
+> How to work with this `params` property or in other words with the `ActivatedRoute` ?
 
 
+We wanna get a reference to the router and we wanna put a spy on it to be sure that the `navigare` method has been called.
 
+```
+  it('should navigate the user to the not found page when an invalid user id is passed', () => {
+    let router = TestBed.(Router);
+    let spy = spyOn(router, 'navigate');
+  });
+```
 
+We need to get a reference to the activated route obj:
 
+```
+  it('should navigate the user to the not found page when an invalid user id is passed', () => {
+    let router = TestBed.(Router);
+    let spy = spyOn(router, 'navigate');
+    
+    let route: ActivatedRouteStub = TestBed.(ActivatedRoute);
+    
+  });
+```
 
+> Earlier we told Angular to `{ provide: ActivatedRoute, useClass: ActivatedRouteStub }`
 
+Back to our test:
 
+```
+ let route: ActivatedRouteStub = TestBed.(ActivatedRoute);
+ route.params
+```
 
-
-
-
-
+> When we get intellisens we notice that all the method are just for reading value from this observable. In oher words we no have any method to push a new value to this observable. 

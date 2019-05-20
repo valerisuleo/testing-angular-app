@@ -26,4 +26,8 @@ describe('VoterComponent', () => {
 
     expect(el.innerText).toContain('21');
   });
+
+  it('it should highlight the upVote btn if I have upvoted', () => {
+    
+  });
 });
