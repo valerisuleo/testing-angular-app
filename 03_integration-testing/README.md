@@ -369,37 +369,38 @@ Let's initialise this `params: Observable<any> = EMPTY;` to empty observable.
 
 ## Testing Navigation
 
-1. We wanna add a `spy` on the `navigate` method of the router, in order to do that we need a reference to this router:
+**1** We wanna add a `spy` on the `navigate` method of the router, in order to do that we need a reference to this router:
 
-	```
-	  it('should redirect user to the user page after saving', () => {
-	    let router = TestBed.get(Router);
-	    let spy = spyOn(router, 'navigate');
-	
-	    component.save();
-	
-	    expect(spy).toHaveBeenCalledWith(['users']);
-	  });
-	```
-
-2. We wanna ensure that we have a `route` configured for this path.
-
-	`touch app/app.routes.ts`
-	
-	```
-	import { routes } from './app.routes';
-	import { UsersComponent } from './users/users.component';
-	
-	describe('routes', () => {
-	
-	  it('should contain a route for /users', () => {
-	
-	    expect(routes).toContain({ path: 'users', component: UsersComponent });
-	  });
-	
-	
-	});
 ```
+  it('should redirect user to the user page after saving', () => {
+    let router = TestBed.get(Router);
+    let spy = spyOn(router, 'navigate');
+	
+    component.save();
+	
+    expect(spy).toHaveBeenCalledWith(['users']);
+  });
+```
+
+**2** We wanna ensure that we have a `route` configured for this path.
+
+`touch app/app.routes.ts`
+	
+```
+import { routes } from './app.routes';
+import { UsersComponent } from './users/users.component';
+	
+describe('routes', () => {
+	
+  it('should contain a route for /users', () => {
+	
+    expect(routes).toContain({ path: 'users', component: UsersComponent });
+  });
+	
+	
+});
+```
+
 
 
 
@@ -416,12 +417,12 @@ Let's initialise this `params: Observable<any> = EMPTY;` to empty observable.
   }
 ```
 
-Here we are subscribing to the `params` property of these route which is an **observable** 
+Here we are subscribing to the `params` property of these `route ` which is an **observable**. 
 
-> How to work with this `params` property or in other words with the `ActivatedRoute` ?
+> How can we work with this `params` property or in other words with the `ActivatedRoute`?
 
 
-We wanna get a reference to the router and we wanna put a spy on it to be sure that the `navigare` method has been called.
+We wanna get a reference to the `router` and we wanna put a `spy` on it to be sure that the `navigate` method has been called.
 
 ```
   it('should navigate the user to the not found page when an invalid user id is passed', () => {
@@ -434,21 +435,53 @@ We need to get a reference to the activated route obj:
 
 ```
   it('should navigate the user to the not found page when an invalid user id is passed', () => {
-    let router = TestBed.(Router);
+    let router = TestBed.get(Router);
     let spy = spyOn(router, 'navigate');
-    
-    let route: ActivatedRouteStub = TestBed.(ActivatedRoute);
+
+    let route: ActivatedRouteStub = TestBed.get(ActivatedRoute)
     
   });
 ```
 
-> Earlier we told Angular to `{ provide: ActivatedRoute, useClass: ActivatedRouteStub }`
+>The `type` of this object is `ActivatedRouteStub` because we told to Angular: `{ provide: ActivatedRoute, useClass: ActivatedRouteStub }`
 
 Back to our test:
 
 ```
  let route: ActivatedRouteStub = TestBed.(ActivatedRoute);
- route.params
+ route.params.
 ```
 
-> When we get intellisens we notice that all the method are just for reading value from this observable. In oher words we no have any method to push a new value to this observable. 
+>Intellisense is showing us only reading methods. We don't have any method to push a new value to this observable. 
+
+Let's make it right!
+
+```
+class ActivatedRouteStub {
+  private subject = new Subject();
+  
+  params: Observable<any> = EMPTY;
+}
+```
+
+We define a private field `subject` and initialise it to a new instance of the subject class.
+
+>`Subject()` is a class define in `rxjs`, it is an observable + has a method `next()` that we can call to push a new value into to this observable.
+
+```
+class ActivatedRouteStub {
+  private subject = new Subject();
+  
+  push(value: any) {
+    this.subject.next(value)
+  }
+    // params: Observable<any> = EMPTY;
+    get params() {
+    return this.subject.asObservable();
+  }
+}
+```
+
+
+
+
