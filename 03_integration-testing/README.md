@@ -301,6 +301,170 @@ It will work! :)
 if `upVote()` I wanna be sure that we apply the `highlighted` class to our icon.
 
 
+## Testing Event Binding
+
+Okay now we want to write a test around this event binding.
+
+So I want to get a reference to this DOM element of this icon and click here and then I want to ensure that total vote is increased.
+
+```
+    <i
+        class="glyphicon glyphicon-menu-up vote-button"
+        [class.highlighted]="myVote == 1"
+        (click)="upVote()"></i>
+
+    <span class="vote-count">{{ totalVotes }}</span>
+
+    <i
+```
+
+In this lecture we just want to focus on the **integration of this component and its template.**
+ We're not going to repeat all these four execution paths in our integration tests. So as long as we click this element and then the `totalVotes` increase, we can ensure that this component is integrated with its template properly.
+
+So back to `/spec` file:
+
+```
+it('it should increase totalVotes when I click the upvote btn', () => {
+
+  });
+```
+
+We  want to get a reference to this DOM element.
+
+```
+it('it should increase totalVotes when I click the upvote btn', () => {
+    let btn = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
+  });
+```
+
+We have to tell it to click this `btn`
+
+```
+it('it should increase totalVotes when I click the upvote btn', () => {
+    let btn = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
+    btn.triggerEventHandler('click', null);
+  });
+```
+
+> `triggerEventHandler('', null);` takes 2 args: the first one is the eventListener that is gonna trig the event and  the second argument is an object that represents additional data about the event. In this case we don't need an event object because clicking a button does not involve any additional data.
+
+
+```
+  it('it should increase totalVotes when I click the upvote btn', () => {
+    let btn = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
+    btn.triggerEventHandler('click', null);
+
+    expect(component.totalVotes).toBe(1);
+  });
+```
+
+## Providing the Dependencies
+
+Now let's take a look at an example of a component that uses a **dependency**.
+
+Back to `/todos` we can see `constructor(private service: TodoService)`. But in the `spec` Angular is not aware of the existence of this service. We nedd to tell it:
+
+
+```
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ TodosComponent ],
+      
+      providers: [TodoService]
+      
+    })
+    .compileComponents();
+  }));
+```
+
+
+Back to the terminal we got an **error** `no provider for HTTP!`
+
+> Why?
+
+Thats because we need to `import { HttpModule } from '@angular/http';`
+
+```
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+    
+      imports: [ HttpModule ],
+      
+      declarations: [ TodosComponent ],
+      providers: [ TodoService ]
+    })
+    .compileComponents();
+  }));
+```
+
+## Getting Dependencies
+
+I'm going to show you how to get access to these dependencies so you can change the implementation using `spy`.
+
+We wanna write an *integration test* to be sure that the service is called `OnInit` and it returns an a collection.  
+
+```
+  ngOnInit() {
+    this.service.getTodos().subscribe(t => this.todos = t);
+  }
+```
+
+Now here we need to get a reference to that service dependency.
+
+```
+  it('should load todos from the server', () => {
+    
+  });
+```
+
+> How do we do that?
+
+ We can get it from the `TestBed`.
+ 
+```
+it('should load todos from the server', () => {
+let service = TestBed.get(TodoService)
+});
+```
+
+We need now to change the implementation of `getTodos()` method using a `spy`.
+
+
+```
+  it('should load todos from the server', () => {
+
+    let service = TestBed.get(TodoService);
+    let arrayofObj = [
+          { id: 1, title: 'a'},
+          { id: 2, title: 'b'},
+          { id: 3, title: 'c'}
+        ];
+
+
+    spyOn(service, 'getTodos').and.callFake(() => {
+      var obs = from([arrayofObj]);
+      return obs;
+    });
+
+    fixture.detectChanges();
+    // component.ngOnInit();
+
+    expect(component.todos.length).toEqual(3);
+  });
+```
+
+> Testing the `ngOnInit` method may be tricky so when we **_Act_** we should use `fixture.detectChanges();` instead of component.ngOnInit(). However always remember to... 
+
+```
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TodosComponent);
+    component = fixture.componentInstance;
+    // fixture.detectChanges();
+  });
+```
+
+...comment out the `fixture.detectChanges();` inside `beforeEach` otherwise it won't work. 
+
 
 ## Providing Stubs
 
