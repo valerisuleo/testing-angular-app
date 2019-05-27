@@ -27,7 +27,7 @@ describe('VoterComponent', () => {
     expect(el.innerText).toContain('21');
   });
 
-  it('it should highlight the upVote btn if I have upvoted', () => {
-    
+  it('it should increase totalVotes when I click the upvote btn', () => {
+    let de = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
   });
 });

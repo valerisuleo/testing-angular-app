@@ -68,7 +68,7 @@ describe('UserDetailsComponent', () => {
     let spy = spyOn(router, 'navigate');
 
     let route: ActivatedRouteStub = TestBed.get(ActivatedRoute);
-    route.push({ id: 0});
+    route.push({ id: 0} );
 
     expect(spy).toHaveBeenCalledWith(['not-found']);
   });
