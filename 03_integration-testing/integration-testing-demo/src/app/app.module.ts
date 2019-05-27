@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { TodoService } from './todos/todo.service';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -13,6 +14,7 @@ import { routes } from './app.routes';
 // import { NavComponent } from './nav/nav.component';
 import { HighlightDirective } from './highlight.directive';
 import { UserDetailsComponent } from './user-details/user-details.component';
+import { TodosComponent } from './todos/todos.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,8 @@ import { UserDetailsComponent } from './user-details/user-details.component';
     HomeComponent,
     UsersComponent,
     HighlightDirective,
-    UserDetailsComponent
+    UserDetailsComponent,
+    TodosComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +33,9 @@ import { UserDetailsComponent } from './user-details/user-details.component';
     FormsModule,
     HttpModule
   ],
-  providers: [],
+  providers: [
+    TodoService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -28,6 +28,9 @@ describe('VoterComponent', () => {
   });
 
   it('it should increase totalVotes when I click the upvote btn', () => {
-    let de = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
+    let btn = fixture.debugElement.query(By.css('.glyphicon-menu-up'));
+    btn.triggerEventHandler('click', null);
+
+    expect(component.totalVotes).toBe(1);
   });
 });
