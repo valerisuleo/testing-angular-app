@@ -2,7 +2,7 @@
 
 It's the practice of writing code to test our code and then run those test in automated way.
 
-Imagine we have this function somewhere in our application. It's base calculating `fun` and based on some conditions return a different value.
+Imagine we have this function somewhere in our application. It's base calculating `fn` and based on some conditions return a different value.
 Now with _manual testing_ we have to launch the app on the browser and it takes time...
 
 ```
@@ -24,7 +24,7 @@ var result = calculate(y);
 
 **Automated testing help you to catch defects before realising your software.**
 
->be **pragmatic**
+>Be **pragmatic**
 
 Although automated test has lots of pros, it does not always fit any team or project. First the team needs discipline in order to write and maintain automated tests. If you don't work in a team like that, it may cost you more than the value you can get out of it, because you will spend lots of time trying to fix broken code test.
 
@@ -58,7 +58,7 @@ They are:
 
 _Test a component with external resources (e.g. file system, database, api endpoints)._
 
-In `angular` terms that means testing a components along whit its templates.
+In `angular` terms that means testing a components along with its templates.
 
 We can't look at this `class` as a plain typescript class we need to look at it as angular `component` and It need to be tested into an angular environment. So we need to instruct angular to compile this class along with its template.
 
